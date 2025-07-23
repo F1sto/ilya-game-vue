@@ -4,11 +4,32 @@ import {AGES, clients, medicals,} from './scripts/consts.js';
 
 const copRating = ref(0);
 const balance = ref(50);
+const clientsArray = ref(Object.values(clients));
 
 const buyVolume = ref(0);
 const sellVolume = ref(0);
-const selectedProduct = ref(null);
+const selectedProduct = ref(null); // todo: remove
 const selectedBuyer = ref(null);
+const clientInLine = ref([]);
+
+for (let i = 0; i < 3; i++) {
+  clientInLine.value.push(getNewRandomClient())
+}
+
+
+function getNewRandomClient() {
+  const randomClint = {...clientsArray.value[Math.floor(Math.random() * clientsArray.value.length)]};
+
+  const existedRandomInLine = clientInLine.value.find((client) => client.id === randomClint.id)
+
+  // Если рандомный клиент существует в очереди, запускаем функцию заново. Функция вернет клиента, которого нет в очереди
+  if (existedRandomInLine) {
+    return getNewRandomClient()
+  } else {
+    return randomClint
+  }
+}
+
 
 const historyLog = ref([])
 const errorMessage = ref('');
@@ -52,8 +73,20 @@ function sell() {
   }
 
   balance.value += price * sellVolume.value;
-
   medicals[selectedProduct.value.name].volume -= sellVolume.value;
+
+  // Фильтр убирает выбранного клиента из очереди
+  clientInLine.value = clientInLine.value.filter((client) => {
+    return client.id !== selectedBuyer.value.id
+  })
+
+  // Увеличиваем ожидание оставшимся клиентам в очереди
+  clientInLine.value.forEach((client) => {
+    client.awaiting += 1;
+  });
+
+  // Добавляем нового клиента в очередь
+  clientInLine.value.push(getNewRandomClient());
 
   historyLog.value.push(`Клиент ${selectedBuyer.value.name}, купил ${sellVolume.value} ${selectedProduct.value.name}, по цене ${price}`);
 
@@ -121,18 +154,23 @@ function buy() {
         <h3>Клиенты</h3>
         <div class="cards-wrapper">
           <div
-            v-for="client in Object.values(clients)"
+            v-for="client in clientInLine"
             class="card"
             :class="{selected: selectedBuyer?.name === client.name}"
             @click="selectedBuyer = {...client}"
           >
-            <div>
-              <span class="label">Имя:</span>
+            <div class="card__row">
+              <span class="label">Имя: </span>
               <span>{{ client.name }}</span>
             </div>
 
-            <div>
-              <span class="label">Возраст:</span>
+            <div class="card__row">
+              <span class="label">Ожидание: </span>
+              <span>{{ client.awaiting }}</span>
+            </div>
+
+            <div class="card__row">
+              <span class="label">Возраст: </span>
               <span>{{ client.age }}</span>
             </div>
           </div>
@@ -253,6 +291,10 @@ function buy() {
   align-items: flex-start;
   background: #818080;
   border-radius: 10px;
+}
+
+.card__row {
+  display: flex;
 }
 
 .card.selected {

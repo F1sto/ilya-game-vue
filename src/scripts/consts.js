@@ -21,19 +21,27 @@ export const medicals = {
 
 export const clients = {
   Oleg: {
+    id: 1,
     name: `Oleg`,
-    age: AGES.young
+    age: AGES.young,
+    awaiting: 0,
   },
   Semen: {
+    id: 2,
     name: `Semen`,
-    age: AGES.old
+    age: AGES.old,
+    awaiting: 0,
   },
   Kate: {
+    id: 3,
     name: `Kate`,
-    age: AGES.young
+    age: AGES.young,
+    awaiting: 0,
   },
   Bob: {
+    id: 4,
     name: `Bob`,
-    age: AGES.old
+    age: AGES.old,
+    awaiting: 0,
   },
 };
