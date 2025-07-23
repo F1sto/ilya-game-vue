@@ -4,30 +4,20 @@ export const AGES = {
   adult: `adult`,
 };
 
-export const warehouse = {
-  baralgin: {
-    price: 9,
-    name: `baralgin`,
-  },
-  trigande: {
-    price: 6,
-    name: `trigande`,
-  },
-}
-
 export const medicals = {
   baralgin: {
     price: 10,
     name: `baralgin`,
     volume: 10,
+    warehousePrice: 9
   },
   trigande: {
     price: 10,
     name: `trigande`,
     volume: 10,
+    warehousePrice: 6
   },
 };
-
 
 export const clients = {
   Oleg: {

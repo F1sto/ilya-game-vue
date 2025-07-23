@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import {AGES, clients, medicals, warehouse} from './scripts/consts.js';
+import {AGES, clients, medicals,} from './scripts/consts.js';
 
 const copRating = ref(0);
 const balance = ref(50);
@@ -82,7 +82,7 @@ function buy() {
     return;
   }
 
-  const totalPrice = warehouse[selectedProduct.value.name].price * buyVolume.value
+  const totalPrice = selectedProduct.value.warehousePrice * buyVolume.value
 
   if (balance.value < totalPrice) {
     errorMessage.value = `Нужно больше золота!`
@@ -93,7 +93,7 @@ function buy() {
   medicals[selectedProduct.value.name].volume += buyVolume.value;
   balance.value -= totalPrice;
 
-  historyLog.value.push(`Вы закупились ${buyVolume.value} ${selectedProduct.value.name} по цене ${warehouse[selectedProduct.value.name].price}`);
+  historyLog.value.push(`Вы закупились ${buyVolume.value} ${selectedProduct.value.name} по цене ${selectedProduct.value.warehousePrice}`);
 
   selectedProduct.value = null;
   buyVolume.value = 0;
@@ -196,7 +196,7 @@ function buy() {
 
             <div>
               <span class="label">Цена склада:</span>
-              <span>{{ warehouse[product.name].price }}</span>
+              <span>{{ product.warehousePrice }}</span>
 
             </div>
 
