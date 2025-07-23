@@ -9,13 +9,15 @@ export const medicals = {
     price: 10,
     name: `baralgin`,
     volume: 10,
-    warehousePrice: 9
+    warehousePrice: 9,
+    id: 1
   },
   trigande: {
     price: 10,
     name: `trigande`,
     volume: 10,
-    warehousePrice: 6
+    warehousePrice: 6,
+    id: 2
   },
 };
 
@@ -25,23 +27,27 @@ export const clients = {
     name: `Oleg`,
     age: AGES.young,
     awaiting: 0,
+    wishProductId: 1, // todo: wishVolume
   },
   Semen: {
     id: 2,
     name: `Semen`,
     age: AGES.old,
     awaiting: 0,
+    wishProductId: 1,
   },
   Kate: {
     id: 3,
     name: `Kate`,
     age: AGES.young,
     awaiting: 0,
+    wishProductId: 1,
   },
   Bob: {
     id: 4,
     name: `Bob`,
     age: AGES.old,
     awaiting: 0,
+    wishProductId: 1,
   },
 };

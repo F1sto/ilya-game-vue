@@ -1,24 +1,31 @@
 <script setup>
 import { ref } from 'vue';
-import {AGES, clients, medicals,} from './scripts/consts.js';
+import { AGES, clients, medicals } from './scripts/consts.js';
 
 const copRating = ref(0);
 const balance = ref(50);
 const clientsArray = ref(Object.values(clients));
+const productArray = ref(Object.values(medicals));
 
 const buyVolume = ref(0);
 const sellVolume = ref(0);
-const selectedProduct = ref(null); // todo: remove
+const selectedProduct = ref(null);
 const selectedBuyer = ref(null);
 const clientInLine = ref([]);
+
+const historyLog = ref([])
+const errorMessage = ref('');
 
 for (let i = 0; i < 3; i++) {
   clientInLine.value.push(getNewRandomClient())
 }
 
-
 function getNewRandomClient() {
-  const randomClint = {...clientsArray.value[Math.floor(Math.random() * clientsArray.value.length)]};
+  const randomProductId =  productArray.value[Math.floor(Math.random() * productArray.value.length)].id
+  const randomClint = {
+    ...clientsArray.value[Math.floor(Math.random() * clientsArray.value.length)],
+    wishProductId: randomProductId,
+  };
 
   const existedRandomInLine = clientInLine.value.find((client) => client.id === randomClint.id)
 
@@ -30,20 +37,18 @@ function getNewRandomClient() {
   }
 }
 
-
-const historyLog = ref([])
-const errorMessage = ref('');
-
 function sell() {
   errorMessage.value = '';
 
-  if (!selectedProduct.value || !selectedBuyer.value) {
-    errorMessage.value = `Не выбран продукт или покупатель`
+  if (!selectedBuyer.value) {
+    errorMessage.value = `Не выбран покупатель`
     return;
   }
 
-  if (!selectedProduct.value.volume || sellVolume.value > selectedProduct.value.volume) {
-    errorMessage.value = `Недостаточно объема у продукта ${selectedProduct.value.name}`
+  const wishProduct = getProductById(selectedBuyer.value.wishProductId);
+
+  if (!wishProduct.volume || sellVolume.value > wishProduct.volume) {
+    errorMessage.value = `Недостаточно объема у продукта ${wishProduct.name}`
     return;
   }
 
@@ -52,7 +57,7 @@ function sell() {
     return;
   }
 
-  let price = selectedProduct.value.price
+  let price = wishProduct.price
 
   if (selectedBuyer.value.age === AGES.old) {
     price -= 8;
@@ -73,7 +78,7 @@ function sell() {
   }
 
   balance.value += price * sellVolume.value;
-  medicals[selectedProduct.value.name].volume -= sellVolume.value;
+  medicals[wishProduct.name].volume -= sellVolume.value;
 
   // Фильтр убирает выбранного клиента из очереди
   clientInLine.value = clientInLine.value.filter((client) => {
@@ -88,7 +93,7 @@ function sell() {
   // Добавляем нового клиента в очередь
   clientInLine.value.push(getNewRandomClient());
 
-  historyLog.value.push(`Клиент ${selectedBuyer.value.name}, купил ${sellVolume.value} ${selectedProduct.value.name}, по цене ${price}`);
+  historyLog.value.push(`Клиент ${selectedBuyer.value.name}, купил ${sellVolume.value} ${wishProduct.name}, по цене ${price}`);
 
   if (copRating.value === 10) {
     errorMessage.value = `GameOver: potracheno`;
@@ -98,7 +103,6 @@ function sell() {
     errorMessage.value = `GameOver: deneg.net`;
   }
 
-  selectedProduct.value = null;
   selectedBuyer.value = null;
   sellVolume.value = 0;
 }
@@ -134,7 +138,9 @@ function buy() {
 
 }
 
-
+function getProductById(id) {
+  return productArray.value.find((medical) => medical.id === id)
+}
 </script>
 
 <template>
@@ -165,13 +171,18 @@ function buy() {
             </div>
 
             <div class="card__row">
-              <span class="label">Ожидание: </span>
-              <span>{{ client.awaiting }}</span>
+              <span class="label">Возраст: </span>
+              <span>{{ client.age }}</span>
             </div>
 
             <div class="card__row">
-              <span class="label">Возраст: </span>
-              <span>{{ client.age }}</span>
+              <span class="label">Хочу: </span>
+              <span>{{ getProductById(client.wishProductId).name }}</span>
+            </div>
+
+            <div class="card__row">
+              <span class="label">Ожидание: </span>
+              <span>{{ client.awaiting }}</span>
             </div>
           </div>
         </div>
